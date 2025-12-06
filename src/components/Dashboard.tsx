@@ -1,0 +1,472 @@
+import { useState } from "react";
+import {
+  Building2,
+  LogOut,
+  DollarSign,
+  AlertCircle,
+  CheckCircle,
+  Plus,
+  Search,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { PropertyCard } from "./PropertyCard";
+import { ManagePropertiesModal } from "./ManagePropertiesModal";
+import { EditPropertyModal } from "./EditPropertyModal";
+import { RecordPaymentModal } from "./RecordPaymentModal";
+import { PaymentHistoryModal } from "./PaymentHistoryModal";
+import type { User } from "../App";
+
+export interface Property {
+  id: string;
+  apartmentName: string;
+  houseNumber: string;
+  tenantName: string;
+  rentAmount: number;
+  debt: number;
+  isPaid: boolean;
+  paymentHistory: { date: string; amount: number }[];
+}
+
+interface DashboardProps {
+  user: User;
+  onLogout: () => void;
+}
+
+export function Dashboard({ user, onLogout }: DashboardProps) {
+  const [properties, setProperties] = useState<Property[]>([
+    {
+      id: "1",
+      apartmentName: "Sunset Towers",
+      houseNumber: "A-101",
+      tenantName: "John Smith",
+      rentAmount: 1200,
+      debt: 0,
+      isPaid: true,
+      paymentHistory: [],
+    },
+    {
+      id: "2",
+      apartmentName: "Sunset Towers",
+      houseNumber: "A-102",
+      tenantName: "Sarah Johnson",
+      rentAmount: 1200,
+      debt: 1200,
+      isPaid: false,
+      paymentHistory: [],
+    },
+    {
+      id: "3",
+      apartmentName: "Sunset Towers",
+      houseNumber: "B-201",
+      tenantName: "Michael Brown",
+      rentAmount: 1400,
+      debt: 2800,
+      isPaid: false,
+      paymentHistory: [],
+    },
+    {
+      id: "4",
+      apartmentName: "Parkview Apartments",
+      houseNumber: "301",
+      tenantName: "Emily Davis",
+      rentAmount: 1100,
+      debt: 0,
+      isPaid: true,
+      paymentHistory: [],
+    },
+  ]);
+
+  const [showManageModal, setShowManageModal] = useState(false);
+  const [editingProperty, setEditingProperty] =
+    useState<Property | null>(null);
+  const [paymentProperty, setPaymentProperty] =
+    useState<Property | null>(null);
+  const [historyProperty, setHistoryProperty] =
+    useState<Property | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const togglePaymentStatus = (id: string) => {
+    setProperties(
+      properties.map((prop) =>
+        prop.id === id
+          ? { ...prop, isPaid: !prop.isPaid }
+          : prop,
+      ),
+    );
+  };
+
+  const addProperty = (property: Omit<Property, "id">) => {
+    const newProperty = {
+      ...property,
+      id: Date.now().toString(),
+      paymentHistory: property.paymentHistory || [],
+    };
+    setProperties([...properties, newProperty]);
+  };
+
+  const updateProperty = (
+    id: string,
+    updates: Partial<Property>,
+  ) => {
+    setProperties(
+      properties.map((prop) =>
+        prop.id === id ? { ...prop, ...updates } : prop,
+      ),
+    );
+  };
+
+  const deleteProperty = (id: string) => {
+    setProperties(properties.filter((prop) => prop.id !== id));
+  };
+
+  const recordPayment = (id: string, amount: number) => {
+    setProperties(
+      properties.map((prop) => {
+        if (prop.id === id) {
+          const newDebt = Math.max(0, prop.debt - amount);
+          return {
+            ...prop,
+            debt: newDebt,
+            isPaid: newDebt === 0,
+            paymentHistory: [
+              ...prop.paymentHistory,
+              {
+                date: new Date().toISOString().split("T")[0],
+                amount,
+              },
+            ],
+          };
+        }
+        return prop;
+      }),
+    );
+  };
+
+  // Filter properties based on search query
+  const filteredProperties = properties.filter((property) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      property.apartmentName.toLowerCase().includes(query) ||
+      property.houseNumber.toLowerCase().includes(query) ||
+      property.tenantName.toLowerCase().includes(query)
+    );
+  });
+
+  const unpaidCount = properties.filter(
+    (p) => !p.isPaid,
+  ).length;
+  const totalRent = properties.reduce(
+    (sum, p) => sum + p.rentAmount,
+    0,
+  );
+  const totalCollected = properties
+    .filter((p) => p.isPaid)
+    .reduce((sum, p) => sum + p.rentAmount, 0);
+  const totalOutstanding = properties
+    .filter((p) => !p.isPaid)
+    .reduce((sum, p) => sum + p.rentAmount, 0);
+  const totalDebt = properties.reduce(
+    (sum, p) => sum + p.debt,
+    0,
+  );
+
+  return (
+    <div
+      className="min-h-screen relative bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80')`,
+      }}
+    >
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/90 via-pink-500/85 to-orange-500/90" />
+
+      {/* Content */}
+      <div className="relative">
+        {/* Header */}
+        <motion.header
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          className="bg-white/10 backdrop-blur-xl border-b-4 border-white/30 shadow-2xl"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl"
+                >
+                  <Building2 className="w-8 h-8 text-white" />
+                </motion.div>
+                <div>
+                  <h1 className="text-white">
+                    🏠 RentMaster Pro
+                  </h1>
+                  <p className="text-purple-100">
+                    Welcome, {user.email.split("@")[0]}!
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowManageModal(true)}
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-xl hover:shadow-2xl transition-all"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add Property
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onLogout}
+                  className="flex items-center gap-2 px-6 py-3 bg-white/20 text-white rounded-xl hover:bg-white/30 transition-all backdrop-blur-sm"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </motion.button>
+              </div>
+            </div>
+          </div>
+        </motion.header>
+
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl shadow-2xl p-6 text-white border-4 border-white/30"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span>Total Properties</span>
+                <Building2 className="w-8 h-8" />
+              </div>
+              <div className="text-white">
+                {properties.length}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ scale: 1.05, rotate: -2 }}
+              className="bg-gradient-to-br from-red-400 to-red-600 rounded-2xl shadow-2xl p-6 text-white border-4 border-white/30"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span>Unpaid Tenants</span>
+                <AlertCircle className="w-8 h-8" />
+              </div>
+              <div className="text-white">{unpaidCount}</div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              className="bg-gradient-to-br from-green-400 to-green-600 rounded-2xl shadow-2xl p-6 text-white border-4 border-white/30"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span>Rent Collected</span>
+                <CheckCircle className="w-8 h-8" />
+              </div>
+              <div className="text-white">
+                ${totalCollected.toLocaleString()}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              whileHover={{ scale: 1.05, rotate: -2 }}
+              className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl shadow-2xl p-6 text-white border-4 border-white/30"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span>Outstanding</span>
+                <DollarSign className="w-8 h-8" />
+              </div>
+              <div className="text-white">
+                ${totalOutstanding.toLocaleString()}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Monthly Summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 mb-8 border-4 border-white/50"
+          >
+            <h2 className="mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              💰 Monthly Summary
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-6 rounded-xl">
+                <p className="text-gray-700 mb-2">
+                  Total Expected Rent
+                </p>
+                <p className="text-gray-900">
+                  ${totalRent.toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-red-100 to-orange-100 p-6 rounded-xl">
+                <p className="text-gray-700 mb-2">
+                  Total Debt Owed
+                </p>
+                <p className="text-red-600">
+                  ${totalDebt.toLocaleString()}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-green-100 to-blue-100 p-6 rounded-xl">
+                <p className="text-gray-700 mb-2">
+                  Collection Rate
+                </p>
+                <p className="text-gray-900">
+                  {totalRent > 0
+                    ? (
+                        (totalCollected / totalRent) *
+                        100
+                      ).toFixed(1)
+                    : 0}
+                  %
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Properties List */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border-4 border-white/50"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                🏢 All Properties
+              </h2>
+
+              {/* Search Bar */}
+              <div className="relative w-full max-w-md">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) =>
+                    setSearchQuery(e.target.value)
+                  }
+                  placeholder="Search by property, unit, or tenant..."
+                  className="w-full pl-12 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {filteredProperties.length === 0 &&
+              searchQuery ? (
+                <div className="text-center py-12">
+                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">
+                    No properties found matching "{searchQuery}"
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSearchQuery("")}
+                    className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl"
+                  >
+                    Clear Search
+                  </motion.button>
+                </div>
+              ) : filteredProperties.length === 0 ? (
+                <div className="text-center py-12">
+                  <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">
+                    No properties yet. Add your first property!
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowManageModal(true)}
+                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl"
+                  >
+                    Add Property
+                  </motion.button>
+                </div>
+              ) : (
+                filteredProperties.map((property, index) => (
+                  <motion.div
+                    key={property.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 + index * 0.1 }}
+                  >
+                    <PropertyCard
+                      property={property}
+                      onTogglePayment={togglePaymentStatus}
+                      onEdit={() =>
+                        setEditingProperty(property)
+                      }
+                      onDelete={deleteProperty}
+                      onRecordPayment={() =>
+                        setPaymentProperty(property)
+                      }
+                      onViewHistory={() =>
+                        setHistoryProperty(property)
+                      }
+                    />
+                  </motion.div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        </main>
+      </div>
+
+      {/* Modals */}
+      {showManageModal && (
+        <ManagePropertiesModal
+          onClose={() => setShowManageModal(false)}
+          onAdd={addProperty}
+        />
+      )}
+
+      {editingProperty && (
+        <EditPropertyModal
+          property={editingProperty}
+          onClose={() => setEditingProperty(null)}
+          onUpdate={(updates) => {
+            updateProperty(editingProperty.id, updates);
+            setEditingProperty(null);
+          }}
+        />
+      )}
+
+      {paymentProperty && (
+        <RecordPaymentModal
+          property={paymentProperty}
+          onClose={() => setPaymentProperty(null)}
+          onRecordPayment={(id, amount) => {
+            recordPayment(id, amount);
+            setPaymentProperty(null);
+          }}
+        />
+      )}
+
+      {historyProperty && (
+        <PaymentHistoryModal
+          property={historyProperty}
+          onClose={() => setHistoryProperty(null)}
+        />
+      )}
+    </div>
+  );
+}
