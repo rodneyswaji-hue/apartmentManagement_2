@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../supabase";
 import {
   Building2,
   LogOut,
@@ -21,6 +22,7 @@ export interface Property {
   apartmentName: string;
   houseNumber: string;
   tenantName: string;
+  phoneNumber: string;
   rentAmount: number;
   debt: number;
   isPaid: boolean;
@@ -32,143 +34,161 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-export function Dashboard({ user, onLogout }: DashboardProps) {
-  const [properties, setProperties] = useState<Property[]>([
-    {
-      id: "1",
-      apartmentName: "Sunset Towers",
-      houseNumber: "A-101",
-      tenantName: "John Smith",
-      rentAmount: 1200,
-      debt: 0,
-      isPaid: true,
-      paymentHistory: [],
-    },
-    {
-      id: "2",
-      apartmentName: "Sunset Towers",
-      houseNumber: "A-102",
-      tenantName: "Sarah Johnson",
-      rentAmount: 1200,
-      debt: 1200,
-      isPaid: false,
-      paymentHistory: [],
-    },
-    {
-      id: "3",
-      apartmentName: "Sunset Towers",
-      houseNumber: "B-201",
-      tenantName: "Michael Brown",
-      rentAmount: 1400,
-      debt: 2800,
-      isPaid: false,
-      paymentHistory: [],
-    },
-    {
-      id: "4",
-      apartmentName: "Parkview Apartments",
-      houseNumber: "301",
-      tenantName: "Emily Davis",
-      rentAmount: 1100,
-      debt: 0,
-      isPaid: true,
-      paymentHistory: [],
-    },
-  ]);
+// Helper: map DB snake_case row → camelCase Property
+const mapProperty = (row: any): Property => ({
+  id: row.id ?? "",
+  apartmentName: row.apartment_name ?? "",
+  houseNumber: row.house_number ?? "",
+  tenantName: row.tenant_name ?? "",
+  phoneNumber: row.phone_number ?? "",
+  rentAmount: row.rent_amount ?? 0,
+  debt: row.debt ?? 0,
+  isPaid: row.is_paid ?? false,
+  paymentHistory: row.payment_history ?? [],
+});
 
+
+export function Dashboard({ user, onLogout }: DashboardProps) {
+  const [properties, setProperties] = useState<Property[]>([]);
   const [showManageModal, setShowManageModal] = useState(false);
-  const [editingProperty, setEditingProperty] =
-    useState<Property | null>(null);
-  const [paymentProperty, setPaymentProperty] =
-    useState<Property | null>(null);
-  const [historyProperty, setHistoryProperty] =
-    useState<Property | null>(null);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [paymentProperty, setPaymentProperty] = useState<Property | null>(null);
+  const [historyProperty, setHistoryProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const togglePaymentStatus = (id: string) => {
-    setProperties(
-      properties.map((prop) =>
-        prop.id === id
-          ? { ...prop, isPaid: !prop.isPaid }
-          : prop,
-      ),
-    );
-  };
-
-  const addProperty = (property: Omit<Property, "id">) => {
-    const newProperty = {
-      ...property,
-      id: Date.now().toString(),
-      paymentHistory: property.paymentHistory || [],
+  // -----------------------------
+  // Fetch all properties from Supabase
+  // -----------------------------
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const { data, error } = await supabase.from("properties").select("*");
+      if (error) {
+        console.error("Error loading properties:", error);
+        return;
+      }
+      setProperties((data || []).map(mapProperty));
     };
-    setProperties([...properties, newProperty]);
+
+    fetchProperties();
+  }, []);
+
+  // -----------------------------
+  // CRUD / Payment Functions
+  // -----------------------------
+  const addProperty = async (property: Omit<Property, "id">) => {
+    const { data, error } = await supabase
+      .from("properties")
+      .insert({
+        apartment_name: property.apartmentName,
+        house_number: property.houseNumber,
+        tenant_name: property.tenantName,
+        phone_number: property.phoneNumber,
+        rent_amount: property.rentAmount,
+        debt: property.debt,
+        is_paid: property.isPaid,
+        payment_history: property.paymentHistory,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error adding property:", error);
+      return;
+    }
+
+    setProperties([...properties, mapProperty(data)]);
   };
 
-  const updateProperty = (
-    id: string,
-    updates: Partial<Property>,
-  ) => {
-    setProperties(
-      properties.map((prop) =>
-        prop.id === id ? { ...prop, ...updates } : prop,
-      ),
-    );
+  const updateProperty = async (id: string, updates: Partial<Property>) => {
+    const { data, error } = await supabase
+      .from("properties")
+      .update({
+        apartment_name: updates.apartmentName,
+        house_number: updates.houseNumber,
+        tenant_name: updates.tenantName,
+        phone_number: updates.phoneNumber,
+        rent_amount: updates.rentAmount,
+        debt: updates.debt,
+        is_paid: updates.isPaid,
+        payment_history: updates.paymentHistory,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Update error:", error);
+      return;
+    }
+
+    setProperties(properties.map((prop) => (prop.id === id ? mapProperty(data) : prop)));
   };
 
-  const deleteProperty = (id: string) => {
+  const deleteProperty = async (id: string) => {
+    const { error } = await supabase.from("properties").delete().eq("id", id);
+    if (error) {
+      console.error("Delete error:", error);
+      return;
+    }
     setProperties(properties.filter((prop) => prop.id !== id));
   };
 
-  const recordPayment = (id: string, amount: number) => {
+  const recordPayment = async (id: string, amount: number) => {
+    const existing = properties.find((p) => p.id === id);
+    if (!existing) return;
+
+    const newDebt = Math.max(0, existing.debt - amount);
+    const updatedHistory = [...existing.paymentHistory, { date: new Date().toISOString().split("T")[0], amount }];
+
+    const { data, error } = await supabase
+      .from("properties")
+      .update({
+        debt: newDebt,
+        is_paid: newDebt === 0,
+        payment_history: updatedHistory,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Payment update error:", error);
+      return;
+    }
+
+    setProperties(properties.map((p) => (p.id === id ? mapProperty(data) : p)));
+  };
+
+  const togglePaymentStatus = (id: string) => {
     setProperties(
-      properties.map((prop) => {
-        if (prop.id === id) {
-          const newDebt = Math.max(0, prop.debt - amount);
-          return {
-            ...prop,
-            debt: newDebt,
-            isPaid: newDebt === 0,
-            paymentHistory: [
-              ...prop.paymentHistory,
-              {
-                date: new Date().toISOString().split("T")[0],
-                amount,
-              },
-            ],
-          };
-        }
-        return prop;
-      }),
+      properties.map((prop) => (prop.id === id ? { ...prop, isPaid: !prop.isPaid } : prop))
     );
   };
 
-  // Filter properties based on search query
+  // -----------------------------
+  // Filter / Aggregate Data
+  // -----------------------------
   const filteredProperties = properties.filter((property) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      property.apartmentName.toLowerCase().includes(query) ||
-      property.houseNumber.toLowerCase().includes(query) ||
-      property.tenantName.toLowerCase().includes(query)
-    );
-  });
+  const query = searchQuery.toLowerCase();
 
-  const unpaidCount = properties.filter(
-    (p) => !p.isPaid,
-  ).length;
-  const totalRent = properties.reduce(
-    (sum, p) => sum + p.rentAmount,
-    0,
+  return (
+    (property.apartmentName?.toLowerCase() ?? "").includes(query) ||
+    (property.houseNumber?.toLowerCase() ?? "").includes(query) ||
+    (property.tenantName?.toLowerCase() ?? "").includes(query)
   );
-  const totalCollected = properties
-    .filter((p) => p.isPaid)
-    .reduce((sum, p) => sum + p.rentAmount, 0);
-  const totalOutstanding = properties
-    .filter((p) => !p.isPaid)
-    .reduce((sum, p) => sum + p.rentAmount, 0);
-  const totalDebt = properties.reduce(
-    (sum, p) => sum + p.debt,
-    0,
-  );
+});
+
+
+  const unpaidCount = properties.filter((p) => !p.isPaid).length;
+  const totalRent = properties.reduce((sum, p) => sum + p.rentAmount, 0);
+  const totalCollected = properties.filter((p) => p.isPaid).reduce((sum, p) => sum + p.rentAmount, 0);
+  const totalOutstanding = properties.filter((p) => !p.isPaid).reduce((sum, p) => sum + p.rentAmount, 0);
+  const totalDebt = properties.reduce((sum, p) => sum + p.debt, 0);
+
+  // -----------------------------
+  // RETURN JSX (Your UI components go here)
+  // -----------------------------
+
 
   return (
     <div

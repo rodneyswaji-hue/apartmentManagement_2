@@ -16,6 +16,7 @@ export function ManagePropertiesModal({
     apartmentName: "",
     houseNumber: "",
     tenantName: "",
+    phoneNumber: "",
     rentAmount: "",
     debt: "",
     isPaid: false,
@@ -28,17 +29,20 @@ export function ManagePropertiesModal({
       apartmentName: formData.apartmentName,
       houseNumber: formData.houseNumber,
       tenantName: formData.tenantName,
+      phoneNumber: formData.phoneNumber,
       rentAmount: parseFloat(formData.rentAmount) || 0,
       debt: parseFloat(formData.debt) || 0,
       isPaid: formData.isPaid,
       paymentHistory: [],
     });
 
+
     // Reset form
     setFormData({
       apartmentName: "",
       houseNumber: "",
       tenantName: "",
+      phoneNumber: "",
       rentAmount: "",
       debt: "",
       isPaid: false,
@@ -189,6 +193,20 @@ export function ManagePropertiesModal({
                   placeholder="e.g., 0"
                 />
               </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Tenant Phone Number</label>
+                <input
+                  type="text"
+                  value={formData.phoneNumber}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phoneNumber: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all"
+                  placeholder="e.g., 555-1234"
+                  required
+                />
+              </div>
+
 
               {/* Payment Status */}
               <div className="flex items-center">

@@ -18,6 +18,7 @@ export function EditPropertyModal({
     apartmentName: property.apartmentName,
     houseNumber: property.houseNumber,
     tenantName: property.tenantName,
+    phoneNumber: property.phoneNumber,
     rentAmount: property.rentAmount.toString(),
     debt: property.debt.toString(),
     isPaid: property.isPaid,
@@ -30,10 +31,13 @@ export function EditPropertyModal({
       apartmentName: formData.apartmentName,
       houseNumber: formData.houseNumber,
       tenantName: formData.tenantName,
+      phoneNumber: formData.phoneNumber,
       rentAmount: parseFloat(formData.rentAmount) || 0,
       debt: parseFloat(formData.debt) || 0,
       isPaid: formData.isPaid,
     });
+    onClose();
+
   };
 
   return (
@@ -178,6 +182,19 @@ export function EditPropertyModal({
                   className="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all"
                 />
               </div>
+              <div>
+                <label className="block text-gray-700 mb-2">Tenant Phone Number</label>
+                <input
+                  type="text"
+                  value={formData.phoneNumber}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phoneNumber: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all"
+                  required
+                />
+              </div>
+
 
               {/* Payment Status */}
               <div className="flex items-center">

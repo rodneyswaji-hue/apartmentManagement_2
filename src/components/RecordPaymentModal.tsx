@@ -33,12 +33,12 @@ export function RecordPaymentModal({
   };
 
   const suggestedAmounts = [
-    { label: "Full Rent", amount: property.rentAmount },
-    { label: "Half Rent", amount: property.rentAmount / 2 },
+    { label: "Full Rent", amount: Number(property.rentAmount) },
+    { label: "Half Rent", amount: Number(property.rentAmount) / 2 },
     {
       label: "Full Debt",
-      amount: property.debt,
-      disabled: property.debt === 0,
+      amount: Number(property.debt),
+      disabled: Number(property.debt) === 0,
     },
   ];
 

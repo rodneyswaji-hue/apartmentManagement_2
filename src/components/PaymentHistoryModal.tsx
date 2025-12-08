@@ -17,7 +17,9 @@ export function PaymentHistoryModal({
   property,
   onClose,
 }: PaymentHistoryModalProps) {
-  const totalPaid = property.paymentHistory.reduce(
+  const history = property.paymentHistory ?? [];
+  const totalPaid = history.reduce(
+
     (sum, payment) => sum + payment.amount,
     0,
   );

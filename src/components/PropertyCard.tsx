@@ -53,15 +53,18 @@ export function PropertyCard({
           </div>
         </div>
 
+        
         {/* Tenant */}
         <div className="lg:col-span-1">
-          <div className="flex items-center gap-2 bg-blue-100 px-3 py-2 rounded-lg">
-            <User className="w-4 h-4 text-blue-600" />
-            <p className="text-gray-900">
-              {property.tenantName}
-            </p>
+          <div className="flex flex-col gap-1 bg-blue-100 px-3 py-2 rounded-lg">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-blue-600" />
+              <p className="text-gray-900">{property.tenantName}</p>
+            </div>
+            <p className="text-gray-500 text-sm">{property.phoneNumber}</p>
           </div>
         </div>
+
 
         {/* Rent Amount */}
         <div className="lg:col-span-1">
