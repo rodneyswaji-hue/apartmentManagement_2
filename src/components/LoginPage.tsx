@@ -38,7 +38,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source
-          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+          src="1209 (1).mp4"
           type="video/mp4"
         />
       </video>
@@ -179,7 +179,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
             <div className="mt-6 text-center">
               <p className="text-gray-600">
-                Demo: Use <b>swaji@gmail.com</b> / <b>5950</b> to login
+                Developed with ❤️ by Rodney Swaji
               </p>
             </div>
           </motion.div>

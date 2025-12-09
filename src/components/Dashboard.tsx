@@ -125,20 +125,6 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
     setProperties(properties.map((prop) => (prop.id === id ? mapProperty(data) : prop)));
   };
 
-  const deleteProperty = async (id: string) => {
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this property? This action cannot be undone."
-  );
-  if (!confirmDelete) return; // User clicked Cancel
-
-  const { error } = await supabase.from("properties").delete().eq("id", id);
-  if (error) {
-    console.error("Delete error:", error);
-    return;
-  }
-
-  setProperties(properties.filter((prop) => prop.id !== id));
-};
 
 
   const recordPayment = async (id: string, amount: number) => {
