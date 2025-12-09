@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LoginPage } from "./components/LoginPage";
 import { Dashboard } from "./components/Dashboard";
 
@@ -10,22 +10,29 @@ export interface User {
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
 
-  const handleLogin = (email: string, password: string) => {
-    // TODO: Replace with actual API call to backend
-    // For now, mock authentication
-    if (email && password) {
-      setUser({
-        email,
-        token: "mock-token-" + Date.now(),
-      });
-      return true;
-    }
-    return false;
-  };
+  // Check localStorage for logged-in user
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) setUser(JSON.parse(savedUser));
+  }, []);
+
+  const handleLogin = (email: string, password: string, remember: boolean) => {
+  if (email === "swaji@gmail.com" && password === "5950") {
+    const loggedInUser: User = {
+      email,
+      token: "mock-token-" + Date.now(),
+    };
+    setUser(loggedInUser);
+    if (remember) localStorage.setItem("user", JSON.stringify(loggedInUser));
+    return true;
+  }
+  return false;
+};
+
 
   const handleLogout = () => {
-    // TODO: Add API call to invalidate token
     setUser(null);
+    localStorage.removeItem("user");
   };
 
   return (

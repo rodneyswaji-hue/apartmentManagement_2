@@ -1,19 +1,15 @@
 import { useState } from "react";
-import {
-  Building2,
-  Lock,
-  Mail,
-  ArrowRight,
-} from "lucide-react";
+import { Building2, Lock, Mail, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface LoginPageProps {
-  onLogin: (email: string, password: string) => boolean;
+  onLogin: (email: string, password: string, remember: boolean) => boolean;
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true); // default: remember me
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,9 +18,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     setError("");
     setIsLoading(true);
 
-    // TODO: Replace with actual API authentication
     setTimeout(() => {
-      const success = onLogin(email, password);
+      const success = onLogin(email, password, remember);
       if (!success) {
         setError("Invalid credentials. Please try again.");
       }
@@ -64,11 +59,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{
-                delay: 0.2,
-                type: "spring",
-                stiffness: 200,
-              }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-3xl mb-4 shadow-2xl"
             >
               <Building2 className="w-10 h-10 text-white" />
@@ -99,11 +90,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border-4 border-white/50"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email */}
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-gray-700 mb-2"
-                >
+                <label htmlFor="email" className="block text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -114,17 +103,15 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all"
-                    placeholder="landlord@example.com"
+                    placeholder="swaji@gmail.com"
                     required
                   />
                 </div>
               </div>
 
+              {/* Password */}
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-gray-700 mb-2"
-                >
+                <label htmlFor="password" className="block text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -133,16 +120,34 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) =>
-                      setPassword(e.target.value)
-                    }
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all"
-                    placeholder="••••••••"
+                    placeholder="••••"
                     required
                   />
                 </div>
               </div>
 
+              {/* Remember Me Toggle */}
+              <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => setRemember(!remember)}>
+                <div className="relative w-10 h-6">
+                  <motion.div
+                    className={`absolute inset-0 rounded-full ${remember ? "bg-purple-600" : "bg-gray-300"}`}
+                    layout
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                  <motion.div
+                    className="absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 shadow-md"
+                    layout
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    animate={{ x: remember ? 20 : 0 }}
+                  />
+                </div>
+                <span className="text-gray-700">Remember Me</span>
+              </div>
+
+
+              {/* Error */}
               {error && (
                 <motion.div
                   initial={{ opacity: 0, x: -10 }}
@@ -153,6 +158,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 </motion.div>
               )}
 
+              {/* Submit */}
               <motion.button
                 type="submit"
                 disabled={isLoading}
@@ -173,7 +179,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
             <div className="mt-6 text-center">
               <p className="text-gray-600">
-                Demo: Use any email and password to login
+                Demo: Use <b>swaji@gmail.com</b> / <b>5950</b> to login
               </p>
             </div>
           </motion.div>

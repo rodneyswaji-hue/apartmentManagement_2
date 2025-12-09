@@ -49,6 +49,7 @@ const mapProperty = (row: any): Property => ({
 
 
 export function Dashboard({ user, onLogout }: DashboardProps) {
+  const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
   const [showManageModal, setShowManageModal] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
@@ -125,13 +126,20 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
   };
 
   const deleteProperty = async (id: string) => {
-    const { error } = await supabase.from("properties").delete().eq("id", id);
-    if (error) {
-      console.error("Delete error:", error);
-      return;
-    }
-    setProperties(properties.filter((prop) => prop.id !== id));
-  };
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this property? This action cannot be undone."
+  );
+  if (!confirmDelete) return; // User clicked Cancel
+
+  const { error } = await supabase.from("properties").delete().eq("id", id);
+  if (error) {
+    console.error("Delete error:", error);
+    return;
+  }
+
+  setProperties(properties.filter((prop) => prop.id !== id));
+};
+
 
   const recordPayment = async (id: string, amount: number) => {
     const existing = properties.find((p) => p.id === id);
@@ -297,7 +305,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                 <CheckCircle className="w-8 h-8" />
               </div>
               <div className="text-white">
-                ${totalCollected.toLocaleString()}
+                KES{totalCollected.toLocaleString()}
               </div>
             </motion.div>
 
@@ -313,7 +321,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                 <DollarSign className="w-8 h-8" />
               </div>
               <div className="text-white">
-                ${totalOutstanding.toLocaleString()}
+                KES{totalOutstanding.toLocaleString()}
               </div>
             </motion.div>
           </div>
@@ -334,7 +342,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                   Total Expected Rent
                 </p>
                 <p className="text-gray-900">
-                  ${totalRent.toLocaleString()}
+                  KES{totalRent.toLocaleString()}
                 </p>
               </div>
               <div className="bg-gradient-to-br from-red-100 to-orange-100 p-6 rounded-xl">
@@ -342,7 +350,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                   Total Debt Owed
                 </p>
                 <p className="text-red-600">
-                  ${totalDebt.toLocaleString()}
+                  KES{totalDebt.toLocaleString()}
                 </p>
               </div>
               <div className="bg-gradient-to-br from-green-100 to-blue-100 p-6 rounded-xl">
@@ -432,17 +440,12 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                     <PropertyCard
                       property={property}
                       onTogglePayment={togglePaymentStatus}
-                      onEdit={() =>
-                        setEditingProperty(property)
-                      }
-                      onDelete={deleteProperty}
-                      onRecordPayment={() =>
-                        setPaymentProperty(property)
-                      }
-                      onViewHistory={() =>
-                        setHistoryProperty(property)
-                      }
+                      onEdit={() => setEditingProperty(property)}
+                      onDelete={() => setPropertyToDelete(property)} // trigger modal
+                      onRecordPayment={() => setPaymentProperty(property)}
+                      onViewHistory={() => setHistoryProperty(property)}
                     />
+
                   </motion.div>
                 ))
               )}
@@ -487,6 +490,53 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
           onClose={() => setHistoryProperty(null)}
         />
       )}
+      {propertyToDelete && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl text-center"
+          >
+            <h2 className="text-xl font-bold mb-4">Delete Property</h2>
+            <p className="mb-6">
+              Are you sure you want to delete <strong>{propertyToDelete.apartmentName} - {propertyToDelete.houseNumber}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setPropertyToDelete(null)}
+                className="px-6 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  // Call your delete function
+                  const { error } = await supabase
+                    .from("properties")
+                    .delete()
+                    .eq("id", propertyToDelete.id);
+                  if (error) {
+                    console.error("Delete error:", error);
+                  } else {
+                    setProperties(properties.filter(p => p.id !== propertyToDelete.id));
+                  }
+                  setPropertyToDelete(null);
+                }}
+                className="px-6 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-all"
+              >
+                Delete
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
     </div>
   );
 }

@@ -102,7 +102,7 @@ export function RecordPaymentModal({
                   Monthly Rent:
                 </span>
                 <span className="text-gray-900">
-                  ${property.rentAmount}
+                  KES{property.rentAmount}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -116,7 +116,7 @@ export function RecordPaymentModal({
                       : "text-green-600"
                   }
                 >
-                  ${property.debt}
+                  KES{property.debt}
                 </span>
               </div>
             </div>
@@ -125,7 +125,7 @@ export function RecordPaymentModal({
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
                 <label className="block text-gray-700 mb-3">
-                  Payment Amount ($)
+                  Payment Amount (KES)
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" />
@@ -175,7 +175,7 @@ export function RecordPaymentModal({
                       <div className="text-xs mb-1">
                         {suggested.label}
                       </div>
-                      <div>${suggested.amount}</div>
+                      <div>KES{suggested.amount}</div>
                     </motion.button>
                   ))}
                 </div>
@@ -211,7 +211,7 @@ export function RecordPaymentModal({
                         New Debt:
                       </span>
                       <span className="text-green-600">
-                        $
+                        KES
                         {Math.max(
                           0,
                           property.debt -

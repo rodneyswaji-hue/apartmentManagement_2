@@ -169,7 +169,7 @@ export function PaymentHistoryModal({
                 </div>
                 <div class="info-item">
                   <div class="info-label">Monthly Rent</div>
-                  <div class="info-value">$${property.rentAmount.toLocaleString()}</div>
+                  <div class="info-value">KES${property.rentAmount.toLocaleString()}</div>
                 </div>
               </div>
             </div>
@@ -207,7 +207,7 @@ export function PaymentHistoryModal({
                           month: "long",
                           day: "numeric",
                         })}</td>
-                        <td style="color: #10b981; font-weight: bold;">$${payment.amount.toLocaleString()}</td>
+                        <td style="color: #10b981; font-weight: bold;">KES${payment.amount.toLocaleString()}</td>
                       </tr>
                     `,
                     )
@@ -222,11 +222,11 @@ export function PaymentHistoryModal({
                 </div>
                 <div class="summary-item">
                   <span>Current Balance Owed:</span>
-                  <span>$${property.debt.toLocaleString()}</span>
+                  <span>KES${property.debt.toLocaleString()}</span>
                 </div>
                 <div class="summary-item summary-total">
                   <span>Total Amount Paid:</span>
-                  <span>$${totalPaid.toLocaleString()}</span>
+                  <span>KES${totalPaid.toLocaleString()}</span>
                 </div>
               </div>
             `
@@ -332,7 +332,7 @@ export function PaymentHistoryModal({
                     Monthly Rent
                   </p>
                   <p className="text-gray-900">
-                    ${property.rentAmount}
+                    KES{property.rentAmount}
                   </p>
                 </div>
                 <div>
@@ -354,7 +354,7 @@ export function PaymentHistoryModal({
                         : "text-green-600"
                     }
                   >
-                    ${property.debt}
+                    KES{property.debt}
                   </p>
                 </div>
               </div>
@@ -462,7 +462,7 @@ export function PaymentHistoryModal({
                       Total Amount Paid:
                     </span>
                     <span className="text-green-600">
-                      ${totalPaid.toLocaleString()}
+                      KES{totalPaid.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between pt-3 border-t-2 border-purple-300">
@@ -476,7 +476,7 @@ export function PaymentHistoryModal({
                           : "text-green-600"
                       }
                     >
-                      ${property.debt.toLocaleString()}
+                      KES{property.debt.toLocaleString()}
                     </span>
                   </div>
                 </div>

@@ -71,7 +71,7 @@ export function PropertyCard({
           <div className="flex items-center gap-2 bg-green-100 px-3 py-2 rounded-lg">
             <DollarSign className="w-4 h-4 text-green-600" />
             <p className="text-gray-900">
-              ${property.rentAmount}
+              KES{property.rentAmount}
             </p>
           </div>
         </div>
@@ -93,7 +93,7 @@ export function PropertyCard({
                   : "text-gray-600"
               }
             >
-              ${property.debt}
+              KES{property.debt}
             </p>
           </div>
         </div>

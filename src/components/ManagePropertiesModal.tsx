@@ -156,7 +156,7 @@ export function ManagePropertiesModal({
               {/* Rent Amount */}
               <div>
                 <label className="block text-gray-700 mb-2">
-                  Monthly Rent ($)
+                  Monthly Rent (KES)
                 </label>
                 <input
                   type="number"
@@ -177,7 +177,7 @@ export function ManagePropertiesModal({
               {/* Debt */}
               <div>
                 <label className="block text-gray-700 mb-2">
-                  Current Debt ($)
+                  Current Debt (KES)
                 </label>
                 <input
                   type="number"
