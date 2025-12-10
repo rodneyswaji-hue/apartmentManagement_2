@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { X, DollarSign, TrendingDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Property } from "./Dashboard";
@@ -16,6 +16,15 @@ export function RecordPaymentModal({
 }: RecordPaymentModalProps) {
   const [paymentAmount, setPaymentAmount] = useState("");
   const [error, setError] = useState("");
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,14 +53,14 @@ export function RecordPaymentModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         />
 
         {/* Modal */}
@@ -59,7 +68,7 @@ export function RecordPaymentModal({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative w-full max-w-lg bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl border-4 border-white/50 overflow-hidden"
+          className="relative w-full max-w-lg bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl border-4 border-white/50 my-8 max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 p-6 text-white">

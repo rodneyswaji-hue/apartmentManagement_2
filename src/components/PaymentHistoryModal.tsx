@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Property } from "./Dashboard";
+import { useEffect } from 'react';
 
 interface PaymentHistoryModalProps {
   property: Property;
@@ -23,6 +24,14 @@ export function PaymentHistoryModal({
     (sum, payment) => sum + payment.amount,
     0,
   );
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleDownloadReceipt = () => {
     const receiptWindow = window.open("", "_blank");

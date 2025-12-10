@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Property } from "./Dashboard";
@@ -24,6 +24,14 @@ export function EditPropertyModal({
     isPaid: property.isPaid,
   });
 
+    // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -42,14 +50,14 @@ export function EditPropertyModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         />
 
         {/* Modal */}
@@ -57,7 +65,7 @@ export function EditPropertyModal({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative w-full max-w-2xl bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-2xl border-4 border-white/50 overflow-hidden"
+          className="relative w-full max-w-2xl bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-2xl border-4 border-white/50 my-8 max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 text-white">
