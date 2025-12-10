@@ -56,6 +56,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
   const [paymentProperty, setPaymentProperty] = useState<Property | null>(null);
   const [historyProperty, setHistoryProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'unpaid'>('all');
 
   // -----------------------------
   // Fetch all properties from Supabase
@@ -125,20 +126,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
     setProperties(properties.map((prop) => (prop.id === id ? mapProperty(data) : prop)));
   };
 
-  const deleteProperty = async (id: string) => {
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this property? This action cannot be undone."
-  );
-  if (!confirmDelete) return; // User clicked Cancel
 
-  const { error } = await supabase.from("properties").delete().eq("id", id);
-  if (error) {
-    console.error("Delete error:", error);
-    return;
-  }
-
-  setProperties(properties.filter((prop) => prop.id !== id));
-};
 
 
   const recordPayment = async (id: string, amount: number) => {
@@ -176,15 +164,24 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
   // -----------------------------
   // Filter / Aggregate Data
   // -----------------------------
-  const filteredProperties = properties.filter((property) => {
+const filteredProperties = properties.filter((property) => {
   const query = searchQuery.toLowerCase();
 
-  return (
+  // Search filter (null-safe)
+  const matchesSearch =
     (property.apartmentName?.toLowerCase() ?? "").includes(query) ||
     (property.houseNumber?.toLowerCase() ?? "").includes(query) ||
-    (property.tenantName?.toLowerCase() ?? "").includes(query)
-  );
+    (property.tenantName?.toLowerCase() ?? "").includes(query);
+
+  // Payment filter
+  const matchesPaymentFilter =
+    paymentFilter === "all" ||
+    (paymentFilter === "paid" && property.isPaid) ||
+    (paymentFilter === "unpaid" && !property.isPaid);
+
+  return matchesSearch && matchesPaymentFilter;
 });
+
 
 
   const unpaidCount = properties.filter((p) => !p.isPaid).length;
@@ -279,19 +276,20 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
               </div>
             </motion.div>
 
-            <motion.div
+            <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.05, rotate: -2 }}
-              className="bg-gradient-to-br from-red-400 to-red-600 rounded-2xl shadow-2xl p-6 text-white border-4 border-white/30"
+              onClick={() => setPaymentFilter('unpaid')}
+              className="bg-gradient-to-br from-red-400 to-red-600 rounded-2xl shadow-2xl p-6 text-white border-4 border-white/30 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-3">
                 <span>Unpaid Tenants</span>
                 <AlertCircle className="w-8 h-8" />
               </div>
               <div className="text-white">{unpaidCount}</div>
-            </motion.div>
+            </motion.button>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -382,6 +380,48 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                 🏢 All Properties
               </h2>
 
+                              {/* Payment Filter Buttons */}
+                <div className="flex gap-2 bg-purple-50 p-1 rounded-xl">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setPaymentFilter('all')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      paymentFilter === 'all'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                        : 'bg-transparent text-gray-700 hover:bg-purple-100'
+                    }`}
+                  >
+                    All
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setPaymentFilter('paid')}
+                    className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
+                      paymentFilter === 'paid'
+                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                        : 'bg-transparent text-gray-700 hover:bg-purple-100'
+                    }`}
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Paid
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setPaymentFilter('unpaid')}
+                    className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
+                      paymentFilter === 'unpaid'
+                        ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
+                        : 'bg-transparent text-gray-700 hover:bg-purple-100'
+                    }`}
+                  >
+                    <AlertCircle className="w-4 h-4" />
+                    Unpaid
+                  </motion.button>
+                </div>
+
               {/* Search Bar */}
               <div className="relative w-full max-w-md">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
@@ -398,20 +438,24 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
             </div>
 
             <div className="space-y-4">
-              {filteredProperties.length === 0 &&
-              searchQuery ? (
+              {filteredProperties.length === 0 && (searchQuery || paymentFilter !== 'all') ? (
                 <div className="text-center py-12">
                   <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600">
-                    No properties found matching "{searchQuery}"
+                    No properties found
+                    {searchQuery && ` matching "${searchQuery}"`}
+                    {paymentFilter !== 'all' && ` with ${paymentFilter} status`}
                   </p>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setPaymentFilter('all');
+                    }}
                     className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl"
                   >
-                    Clear Search
+                    Clear Filters
                   </motion.button>
                 </div>
               ) : filteredProperties.length === 0 ? (
