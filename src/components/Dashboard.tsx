@@ -375,21 +375,22 @@ const filteredProperties = properties.filter((property) => {
             transition={{ delay: 0.6 }}
             className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border-4 border-white/50"
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col gap-4 mb-6">
               <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                 🏢 All Properties
               </h2>
 
-                              {/* Payment Filter Buttons */}
+              <div className="flex items-center gap-4 flex-wrap">
+                {/* Payment Filter Buttons */}
                 <div className="flex gap-2 bg-purple-50 p-1 rounded-xl">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setPaymentFilter('all')}
+                    onClick={() => setPaymentFilter("all")}
                     className={`px-4 py-2 rounded-lg transition-all ${
-                      paymentFilter === 'all'
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                        : 'bg-transparent text-gray-700 hover:bg-purple-100'
+                      paymentFilter === "all"
+                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                        : "bg-transparent text-gray-700 hover:bg-purple-100"
                     }`}
                   >
                     All
@@ -397,11 +398,11 @@ const filteredProperties = properties.filter((property) => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setPaymentFilter('paid')}
+                    onClick={() => setPaymentFilter("paid")}
                     className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
-                      paymentFilter === 'paid'
-                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
-                        : 'bg-transparent text-gray-700 hover:bg-purple-100'
+                      paymentFilter === "paid"
+                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
+                        : "bg-transparent text-gray-700 hover:bg-purple-100"
                     }`}
                   >
                     <CheckCircle className="w-4 h-4" />
@@ -410,11 +411,11 @@ const filteredProperties = properties.filter((property) => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setPaymentFilter('unpaid')}
+                    onClick={() => setPaymentFilter("unpaid")}
                     className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
-                      paymentFilter === 'unpaid'
-                        ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                        : 'bg-transparent text-gray-700 hover:bg-purple-100'
+                      paymentFilter === "unpaid"
+                        ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg"
+                        : "bg-transparent text-gray-700 hover:bg-purple-100"
                     }`}
                   >
                     <AlertCircle className="w-4 h-4" />
@@ -422,18 +423,19 @@ const filteredProperties = properties.filter((property) => {
                   </motion.button>
                 </div>
 
-              {/* Search Bar */}
-              <div className="relative w-full max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) =>
-                    setSearchQuery(e.target.value)
-                  }
-                  placeholder="Search by property, unit, or tenant..."
-                  className="w-full pl-12 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all bg-white"
-                />
+                {/* Search Bar */}
+                <div className="relative flex-1 min-w-[300px]">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) =>
+                      setSearchQuery(e.target.value)
+                    }
+                    placeholder="Search by property, unit, or tenant..."
+                    className="w-full pl-12 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all bg-white"
+                  />
+                </div>
               </div>
             </div>
 
