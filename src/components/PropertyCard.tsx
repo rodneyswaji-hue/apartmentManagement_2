@@ -44,16 +44,13 @@ export function PropertyCard({
               <Home className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-gray-900">
-                {property.apartmentName}
-              </p>
-              <p className="text-purple-600">
-                Unit {property.houseNumber}
-              </p>
+              <p className="text-gray-900">{property.apartmentName}</p>
+              <p className="text-purple-600">Unit {property.houseNumber}</p>
             </div>
           </div>
         </div>
-
+        
+        
         
         {/* Tenant */}
         <div className="lg:col-span-1">
@@ -61,19 +58,16 @@ export function PropertyCard({
             <div className="flex items-center gap-2">
               <User className="w-4 h-4 text-blue-600" />
               <p className="text-gray-900">{property.tenantName}</p>
+
             </div>
-            
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-indigo-600" />
+              <p className="text-gray-900">{property.phoneNumber}</p>
+            </div>
           </div>
         </div>
         
-
-        {/* Phone Number */}
-        <div className="lg:col-span-1">
-          <div className="flex items-center gap-2 bg-indigo-100 px-3 py-2 rounded-lg">
-            <Phone className="w-4 h-4 text-indigo-600" />
-            <p className="text-gray-900">{property.phoneNumber}</p>
-          </div>
-        </div>
+        
 
         {/* Rent Amount */}
         <div className="lg:col-span-1">
@@ -142,7 +136,7 @@ export function PropertyCard({
           )}
         </div>
 
-         {/* Action Buttons */}
+        {/* Action Buttons */}
         <div className="lg:col-span-2 flex flex-col gap-2">
           {/* Top row - Primary actions */}
           <div className="flex gap-2">
