@@ -1,73 +1,142 @@
-# React + TypeScript + Vite
+# 🏢 Apartment Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern **Apartment Management System** built to help landlords or property managers efficiently manage properties, apartments, tenants, and rent payments from a single dashboard.
 
-Currently, two official plugins are available:
+The project focuses on simplicity, clean UI, and reliable data handling using a modern web stack.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* 🔐 **Secure Login System** (single authorized user)
+* 🏠 **Property Management**
 
-## Expanding the ESLint configuration
+  * Add, edit, and delete properties
+* 🚪 **Apartment Management**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+  * Assign apartments to properties
+  * Track rent amount, debt, and payment status
+* 👤 **Tenant Management**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+  * Store tenant name and phone number
+* 💰 **Payment Tracking**
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+  * Record rent payments
+  * Automatically update debt and payment status
+* 🔍 **Search & Filter**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+  * Search by apartment, house number, or tenant name
+  * Filter by payment status (paid / unpaid)
+* 📊 **Dashboard Overview**
+
+  * Clear visual cards for properties and apartments
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+* **React + TypeScript**
+* **Vite** for fast development
+* **Tailwind CSS** for styling
+* **Framer Motion** for animations
+* **Lucide Icons**
+
+### Backend / Database
+
+* **Supabase (PostgreSQL)**
+* SQL-based relational database
+
+---
+
+## 🗂 Database Structure
+
+* **Properties** – stores property/building information
+* **Apartments** – linked to properties, stores rent and payment data
+* **Tenants** – stores tenant name and phone number
+* **Payments** – tracks rent payments per apartment
+
+> SQL schema is included in the project for easy setup.
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone github.com/rodneyswaji-hue/apartmentManagement_2
+cd apartment-management-system
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2️⃣ Install Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+### 3️⃣ Configure Supabase
+
+Create a `.env` file and add your Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 4️⃣ Run the Project
+
+```bash
+npm run dev
+```
+
+The app will be available at:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🔐 Authentication Notes
+
+* The system is designed for **a single authorized user**
+* Sign-up is disabled
+* Login credentials are manually managed in Supabase
+
+---
+
+## 📌 Project Goals
+
+* Learn and apply **TypeScript in a real-world React project**
+* Practice **relational database design**
+* Build a clean, user-friendly dashboard
+* Implement real CRUD operations with Supabase
+
+---
+
+## 📷 Screenshots
+
+
+
+---
+
+## 🧠 Future Improvements
+
+* Role-based authentication
+* Monthly payment reports
+* Export data to CSV/PDF
+* SMS or email rent reminders
+
+---
+
+## 📄 License
+
+This project is open-source and available for learning and personal use.
+
+---
+
+## 🙌 Acknowledgements
+
+Built as a Home project to strengthen skills in **React, TypeScript, SQL, and Supabase**.
